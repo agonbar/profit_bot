@@ -1,6 +1,6 @@
 profit_bot:
    build: .
    environment: 
-      - "TOKEN=283923768:AAG13x1pnvKzn5YnfhEpZpFR1SxfLBSeDAY"
+      - "TOKEN=YOUTOKENHERE"
    volumes:
       - ./bot.db:/app/bot.db
