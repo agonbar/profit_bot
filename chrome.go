@@ -59,7 +59,7 @@ func getSpace(url string) string {
 
 func getStatus(url string) [2]string {
 	// create context
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
 	// run task list
