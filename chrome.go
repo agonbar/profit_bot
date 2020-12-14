@@ -60,7 +60,7 @@ func getSpace(url string) string {
 func getStatus(url string) [2]string {
 	// create context
 	intermecdiate, cancel := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(intermecdiate, time.Minute)
+	ctx, cancel := context.WithTimeout(intermecdiate, 15*time.Minute)
 	defer cancel()
 
 	// run task list
