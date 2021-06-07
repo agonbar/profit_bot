@@ -57,7 +57,7 @@ func getSpace(url string) string {
 	return used + "/" + total
 }
 
-func getStatus(url string) [2]string {
+func getStatus(url string) [3]string {
 	// create context
 	intermecdiate, cancel := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(intermecdiate, 15*time.Minute)
@@ -76,12 +76,12 @@ func getStatus(url string) [2]string {
 		chromedp.Text(priceSelector, &price, chromedp.NodeVisible, chromedp.ByID),
 	)
 	if err != nil {
-		return [2]string{"err", err.Error()}
+		return [3]string{"err", err.Error()}
 	}
 
 	log.Println([2]string{used + "/" + total, price})
 
-	return [2]string{used + "/" + total, price}
+	return [3]string{used, total, price}
 }
 
 func fullScreenshot(urlstr string, quality int64, res *[]byte) chromedp.Tasks {

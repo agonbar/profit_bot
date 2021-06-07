@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -108,10 +109,21 @@ func updateResponse(db *bolt.DB, b *tb.Bot) {
 
 	var users [][2]string = getUsers(db)
 	var nodes = getNodes(db)
+	var total [3]float32
 	for i := 0; i < len(nodes); i++ {
-		var node [2]string = getStatus(nodes[i][1])
-		t.AppendRow([]interface{}{nodes[i][0], node[0], node[1]})
+		var node [3]string = getStatus(nodes[i][1])
+		t.AppendRow([]interface{}{nodes[i][0], node[0] + "/" + node[1], node[2]})
+		if size, err := strconv.ParseFloat(strings.Replace(node[0], "TB", "", -1), 32); err == nil {
+			total[0] += float32(size)
+		}
+		if totalSize, err := strconv.ParseFloat(strings.Replace(node[1], "TB", "", -1), 32); err == nil {
+			total[1] += float32(totalSize)
+		}
+		if price, err := strconv.ParseFloat(strings.Replace(node[2], "$", "", -1), 32); err == nil {
+			total[2] += float32(price)
+		}
 	}
+	t.AppendRow([]interface{}{"Total", fmt.Sprintf("%.2fTB/%.2fTB", total[0], total[1]), fmt.Sprintf("$%.2f", total[2])})
 	for i := 0; i < len(users); i++ {
 		if users[i][1] == "1" {
 			var id, _ = strconv.Atoi(users[i][0])
