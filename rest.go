@@ -36,6 +36,50 @@ type RestSno struct {
 	StartedAt      time.Time `json:"startedAt"`
 }
 
+type RestEstimatedPayout struct {
+	CurrentMonth struct {
+		EgressBandwidth         int64   `json:"egressBandwidth"`
+		EgressBandwidthPayout   float64 `json:"egressBandwidthPayout"`
+		EgressRepairAudit       int64   `json:"egressRepairAudit"`
+		EgressRepairAuditPayout float64 `json:"egressRepairAuditPayout"`
+		DiskSpace               float64 `json:"diskSpace"`
+		DiskSpacePayout         float64 `json:"diskSpacePayout"`
+		HeldRate                int     `json:"heldRate"`
+		Payout                  float64 `json:"payout"`
+		Held                    int     `json:"held"`
+	} `json:"currentMonth"`
+	PreviousMonth struct {
+		EgressBandwidth         int64   `json:"egressBandwidth"`
+		EgressBandwidthPayout   float64 `json:"egressBandwidthPayout"`
+		EgressRepairAudit       int64   `json:"egressRepairAudit"`
+		EgressRepairAuditPayout float64 `json:"egressRepairAuditPayout"`
+		DiskSpace               float64 `json:"diskSpace"`
+		DiskSpacePayout         float64 `json:"diskSpacePayout"`
+		HeldRate                int     `json:"heldRate"`
+		Payout                  float64 `json:"payout"`
+		Held                    float64 `json:"held"`
+	} `json:"previousMonth"`
+	CurrentMonthExpectations int `json:"currentMonthExpectations"`
+}
+
+func getPrice(url string) string {
+	resp, err := http.Get(url + "/api/sno/estimated-payout")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer resp.Body.Close()
+	//Create a variable of the same type as our model
+	var cResp RestEstimatedPayout
+
+	//Decode the data
+	if err := json.NewDecoder(resp.Body).Decode(&cResp); err != nil {
+		log.Fatal("ooopsss! an error occurred, please try again")
+	}
+
+	return fmt.Sprintf("%.2f", (float32(cResp.CurrentMonth.Payout) / 100))
+}
+
 func getSpace(url string) [2]string {
 
 	resp, err := http.Get(url + "/api/sno/")
@@ -58,4 +102,15 @@ func getSpace(url string) [2]string {
 	toret[1] = fmt.Sprintf("%.2f", (float32(cResp.DiskSpace.Available) / 1000000000000))
 
 	return toret
+}
+
+func getStatus(url string) [3]string {
+
+	space := getSpace(url)
+
+	price := getPrice(url)
+
+	log.Println([2]string{space[0] + "/" + space[1], price})
+
+	return [3]string{space[0], space[1], price}
 }
