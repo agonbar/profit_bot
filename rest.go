@@ -65,7 +65,7 @@ type RestEstimatedPayout struct {
 func getPrice(url string) string {
 	resp, err := http.Get(url + "/api/sno/estimated-payout")
 	if err != nil {
-		log.Fatalln(err)
+		return err.Error()
 	}
 
 	defer resp.Body.Close()
@@ -74,7 +74,7 @@ func getPrice(url string) string {
 
 	//Decode the data
 	if err := json.NewDecoder(resp.Body).Decode(&cResp); err != nil {
-		log.Fatal("ooopsss! an error occurred, please try again")
+		return "Err"
 	}
 
 	return fmt.Sprintf("%.2f", (float32(cResp.CurrentMonth.Payout) / 100))
@@ -84,7 +84,7 @@ func getSpace(url string) [2]string {
 
 	resp, err := http.Get(url + "/api/sno/")
 	if err != nil {
-		log.Fatalln(err)
+		return [2]string{err.Error(), ""}
 	}
 
 	defer resp.Body.Close()
@@ -93,7 +93,7 @@ func getSpace(url string) [2]string {
 
 	//Decode the data
 	if err := json.NewDecoder(resp.Body).Decode(&cResp); err != nil {
-		log.Fatal("ooopsss! an error occurred, please try again")
+		return [2]string{"Err Decoding", ""}
 	}
 
 	var toret [2]string
