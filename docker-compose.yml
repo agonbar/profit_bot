@@ -1,6 +1,9 @@
-profit_bot:
-   build: .
-   environment: 
-      - "TOKEN=YOUTOKENHERE"
-   volumes:
-      - ./bot.db:/app/bot.db
+version: '3'
+
+services:
+   profit_bot:
+      build: .
+      environment: 
+         - "TOKEN=YOUTOKENHERE"
+      volumes:
+         - ./bot.db:/app/bot.db
