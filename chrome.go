@@ -32,31 +32,6 @@ func getPrice(url string) string {
 	return res
 }
 
-func getSpace(url string) string {
-	// create context
-	ctx, cancel := chromedp.NewContext(context.Background())
-	defer cancel()
-
-	// run task list
-	var used, total, usedSelector, totalSelector string
-	usedSelector = "#app > div > div.scrollable > div.content-overflow > div > div.info-area > section.info-area__chart-area > section:nth-child(2) > div > div.disk-stat-area__info-area > div:nth-child(1) > p"
-	totalSelector = "#app > div > div.scrollable > div.content-overflow > div > div.info-area > section.info-area__chart-area > section:nth-child(2) > div > p.disk-stat-area__amount"
-	err := chromedp.Run(ctx,
-		chromedp.Navigate(url),
-		chromedp.Sleep(1*time.Second),
-		chromedp.Text(usedSelector, &used, chromedp.NodeVisible, chromedp.ByID),
-		chromedp.Text(totalSelector, &total, chromedp.NodeVisible, chromedp.ByID),
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println(used)
-	log.Println(total)
-
-	return used + "/" + total
-}
-
 func getStatus(url string) [3]string {
 	// create context
 	intermecdiate, cancel := chromedp.NewContext(context.Background())
@@ -64,24 +39,22 @@ func getStatus(url string) [3]string {
 	defer cancel()
 
 	// run task list
-	var used, total, price, usedSelector, totalSelector, priceSelector string
+	var price, priceSelector string
 	priceSelector = "#app > div > div.scrollable > div.content-overflow > div > div.info-area > section.total-payout-area.info-area__total-area > div.total-payout-area__united-info-area > div:nth-child(1) > p.total-payout-area__united-info-area__item__amount"
-	usedSelector = "#app > div > div.scrollable > div.content-overflow > div > div.info-area > section.info-area__chart-area > section:nth-child(2) > div > div.disk-stat-area__info-area > div:nth-child(1) > p"
-	totalSelector = "#app > div > div.scrollable > div.content-overflow > div > div.info-area > section.info-area__chart-area > section:nth-child(2) > div > p.disk-stat-area__amount"
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.Sleep(1*time.Second),
-		chromedp.Text(usedSelector, &used, chromedp.NodeVisible, chromedp.ByID),
-		chromedp.Text(totalSelector, &total, chromedp.NodeVisible, chromedp.ByID),
 		chromedp.Text(priceSelector, &price, chromedp.NodeVisible, chromedp.ByID),
 	)
 	if err != nil {
 		return [3]string{"err", err.Error()}
 	}
 
-	log.Println([2]string{used + "/" + total, price})
+	space := getSpace(url)
 
-	return [3]string{used, total, price}
+	log.Println([2]string{space[0] + "/" + space[1], price})
+
+	return [3]string{space[0], space[1], price}
 }
 
 func fullScreenshot(urlstr string, quality int64, res *[]byte) chromedp.Tasks {

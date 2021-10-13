@@ -33,7 +33,8 @@ func initTG(db *bolt.DB) *tb.Bot {
 		var nodes = getNodes(db)
 		var res string
 		for i := 0; i < len(nodes); i++ {
-			res += "\n" + nodes[i][0] + ": " + getSpace(nodes[i][1])
+			resSpace := getSpace(nodes[i][1])
+			res += "\n" + nodes[i][0] + ": " + resSpace[0] + "/" + resSpace[1]
 		}
 		b.Send(m.Sender, res)
 	})
