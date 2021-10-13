@@ -46,7 +46,7 @@ type RestEstimatedPayout struct {
 		DiskSpacePayout         float64 `json:"diskSpacePayout"`
 		HeldRate                int     `json:"heldRate"`
 		Payout                  float64 `json:"payout"`
-		Held                    int     `json:"held"`
+		Held                    float64 `json:"held"`
 	} `json:"currentMonth"`
 	PreviousMonth struct {
 		EgressBandwidth         int64   `json:"egressBandwidth"`
@@ -63,7 +63,11 @@ type RestEstimatedPayout struct {
 }
 
 func getPrice(url string) string {
-	resp, err := http.Get(url + "/api/sno/estimated-payout")
+	lastChar := url[len(url)-1:]
+	if lastChar != "/" {
+		url = url + "/"
+	}
+	resp, err := http.Get(url + "api/sno/estimated-payout")
 	if err != nil {
 		return err.Error()
 	}
@@ -74,15 +78,18 @@ func getPrice(url string) string {
 
 	//Decode the data
 	if err := json.NewDecoder(resp.Body).Decode(&cResp); err != nil {
-		return "Err"
+		return err.Error()
 	}
 
 	return fmt.Sprintf("%.2f", (float32(cResp.CurrentMonth.Payout) / 100))
 }
 
 func getSpace(url string) [2]string {
-
-	resp, err := http.Get(url + "/api/sno/")
+	lastChar := url[len(url)-1:]
+	if lastChar != "/" {
+		url = url + "/"
+	}
+	resp, err := http.Get(url + "api/sno/")
 	if err != nil {
 		return [2]string{err.Error(), ""}
 	}
@@ -93,7 +100,7 @@ func getSpace(url string) [2]string {
 
 	//Decode the data
 	if err := json.NewDecoder(resp.Body).Decode(&cResp); err != nil {
-		return [2]string{"Err Decoding", ""}
+		return [2]string{err.Error(), ""}
 	}
 
 	var toret [2]string
